@@ -50,7 +50,7 @@ public class MprisActivity extends AppCompatActivity {
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (cacheSink.isNotNull())
                     BackgroundService.RunCommand(getApplicationContext(),
-                            service -> cacheSink.getPlugin().sendVolume(cacheSink.getSink().getName(), Math.max(vol - 2000, 0)));
+                            service -> cacheSink.getPlugin().sendVolume(cacheSink.getSink().getName(), vol = Math.max(vol - 2000, 0)));
                 else if (activityMprisBinding != null && mprisPagerAdapter != null) {
                     int pagePosition = activityMprisBinding.mprisTabs.getSelectedTabPosition();
                     mprisPagerAdapter.onVolumeDown(pagePosition);
