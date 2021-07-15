@@ -27,6 +27,7 @@ class SinkItemHolder extends RecyclerView.ViewHolder
     private final Consumer<Boolean> seekBarTracking;
 
     private Sink sink;
+    private static CacheSink cacheSink;
 
     public SinkItemHolder(
             @NonNull ListItemSystemvolumeBinding viewBinding,
@@ -44,6 +45,16 @@ class SinkItemHolder extends RecyclerView.ViewHolder
         viewBinding.systemvolumeLabel.setOnCheckedChangeListener(this);
         viewBinding.systemvolumeMute.setOnClickListener(this);
         viewBinding.systemvolumeSeek.setOnSeekBarChangeListener(this);
+    }
+
+    public SinkItemHolder(
+            @NonNull ListItemSystemvolumeBinding viewBinding,
+            @NonNull SystemVolumePlugin plugin,
+            @NonNull Consumer<Boolean> seekBarTracking,
+            @NonNull CacheSink cacheSink
+    ) {
+        this(viewBinding, plugin, seekBarTracking);
+        SinkItemHolder.cacheSink = cacheSink;
     }
 
     @Override
@@ -81,6 +92,7 @@ class SinkItemHolder extends RecyclerView.ViewHolder
     @Override
     public boolean onLongClick(View v) {
         Toast.makeText(v.getContext(), sink.getName(), Toast.LENGTH_SHORT).show();
+        cacheSink.setSink(sink);
         return true;
     }
 

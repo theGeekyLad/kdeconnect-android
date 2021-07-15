@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-class Sink {
+public class Sink {
 
     interface UpdateListener {
         void updateSink(Sink sink);
@@ -53,7 +53,7 @@ class Sink {
         return description;
     }
 
-    String getName() {
+    public String getName() {
         return name;
     }
 

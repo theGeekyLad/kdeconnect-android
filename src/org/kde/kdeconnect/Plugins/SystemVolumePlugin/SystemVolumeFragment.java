@@ -43,6 +43,8 @@ public class SystemVolumeFragment
     private final Consumer<Boolean> trackingConsumer = aBoolean -> tracking = aBoolean;
     private SystemVolumeFragmentBinding systemVolumeFragmentBinding;
 
+    private static CacheSink cacheSink;
+
     public static SystemVolumeFragment newInstance(String deviceId) {
         SystemVolumeFragment systemvolumeFragment = new SystemVolumeFragment();
 
@@ -52,6 +54,11 @@ public class SystemVolumeFragment
         systemvolumeFragment.setArguments(arguments);
 
         return systemvolumeFragment;
+    }
+
+    public static SystemVolumeFragment newInstance(String deviceId, CacheSink cacheSink) {
+        SystemVolumeFragment.cacheSink = cacheSink;
+        return newInstance(deviceId);
     }
 
     @Nullable
@@ -103,6 +110,7 @@ public class SystemVolumeFragment
     private void connectToPlugin(final String deviceId) {
         BackgroundService.RunWithPlugin(requireActivity(), deviceId, SystemVolumePlugin.class, plugin -> {
             this.plugin = plugin;
+            cacheSink.setPlugin(plugin);
             plugin.addSinkListener(SystemVolumeFragment.this);
             plugin.requestSinkList();
         });
@@ -178,7 +186,7 @@ public class SystemVolumeFragment
             LayoutInflater inflater = getLayoutInflater();
             ListItemSystemvolumeBinding viewBinding = ListItemSystemvolumeBinding.inflate(inflater, parent, false);
 
-            return new SinkItemHolder(viewBinding, plugin, trackingConsumer);
+            return new SinkItemHolder(viewBinding, plugin, trackingConsumer, cacheSink);
         }
 
         @Override

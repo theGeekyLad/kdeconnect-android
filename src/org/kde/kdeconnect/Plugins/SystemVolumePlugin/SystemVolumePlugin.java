@@ -87,7 +87,7 @@ public class SystemVolumePlugin extends Plugin {
         return true;
     }
 
-    void sendVolume(String name, int volume) {
+    public void sendVolume(String name, int volume) {
         NetworkPacket np = new NetworkPacket(PACKET_TYPE_SYSTEMVOLUME_REQUEST);
         np.set("volume", volume);
         np.set("name", name);

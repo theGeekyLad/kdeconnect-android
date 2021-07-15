@@ -17,6 +17,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import org.kde.kdeconnect.BackgroundService;
+import org.kde.kdeconnect.Plugins.SystemVolumePlugin.CacheSink;
 import org.kde.kdeconnect.Plugins.SystemVolumePlugin.SystemVolumeFragment;
 import org.kde.kdeconnect.UserInterface.ThemeUtil;
 import org.kde.kdeconnect_tp.R;
@@ -29,17 +31,27 @@ public class MprisActivity extends AppCompatActivity {
     private ActivityMprisBinding activityMprisBinding;
     private MprisPagerAdapter mprisPagerAdapter;
 
+    private int vol = 65536;
+
+    private static CacheSink cacheSink;
+
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         switch (keyCode) {
             case KeyEvent.KEYCODE_VOLUME_UP:
-                if (activityMprisBinding != null && mprisPagerAdapter != null) {
+                if (cacheSink.isNotNull())
+                    BackgroundService.RunCommand(getApplicationContext(),
+                            service -> cacheSink.getPlugin().sendVolume(cacheSink.getSink().getName(), vol += 2000));
+                else if (activityMprisBinding != null && mprisPagerAdapter != null) {
                     int pagePosition = activityMprisBinding.mprisTabs.getSelectedTabPosition();
                     mprisPagerAdapter.onVolumeUp(pagePosition);
                 }
                 return true;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
-                if (activityMprisBinding != null && mprisPagerAdapter != null) {
+                if (cacheSink.isNotNull())
+                    BackgroundService.RunCommand(getApplicationContext(),
+                            service -> cacheSink.getPlugin().sendVolume(cacheSink.getSink().getName(), vol -= 2000));
+                else if (activityMprisBinding != null && mprisPagerAdapter != null) {
                     int pagePosition = activityMprisBinding.mprisTabs.getSelectedTabPosition();
                     mprisPagerAdapter.onVolumeDown(pagePosition);
                 }
@@ -88,6 +100,8 @@ public class MprisActivity extends AppCompatActivity {
 
         setSupportActionBar(activityMprisBinding.toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+
+        cacheSink = new CacheSink();
     }
 
     static class MprisPagerAdapter extends ExtendedFragmentAdapter {
@@ -103,7 +117,7 @@ public class MprisActivity extends AppCompatActivity {
         @Override
         public Fragment createFragment(int position) {
             if (position == 1) {
-                return SystemVolumeFragment.newInstance(deviceId);
+                return SystemVolumeFragment.newInstance(deviceId, cacheSink);
             } else {
                 return MprisNowPlayingFragment.newInstance(deviceId);
             }
